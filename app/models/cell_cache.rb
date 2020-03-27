@@ -3,6 +3,7 @@
 class CellCache
   PIXEL_LOCK_CODE_HASH = "0xb75dae11082145889da100b87305b5579213b55a7df72818d5f57a735eb9a6e4"
   PIXEL_TYPE_CODE_HASH = "0x295c725e14ddd32019d09b1a72876d688d494281a1a973aa19eaf9a9d2e84bd1"
+  SYSTEM_TX_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
   def call
     sync_info = SyncInfo.recent.completed.first
@@ -38,11 +39,11 @@ class CellCache
     def create_output(target_block)
       target_block.transactions.each_with_index do |transaction, tx_index|
         consume_cell(transaction)
-        save_outputs(target_block.header.hash, tx_index, transaction)
+        save_outputs(target_block.header.hash, tx_index, transaction, target_block.header.epoch)
       end
     end
 
-    def save_outputs(block_hash, tx_index, transaction)
+    def save_outputs(block_hash, tx_index, transaction, epoch)
       outputs, outputs_data = transaction.outputs, transaction.outputs_data
       attributes =
         outputs.each_with_index.map do |output, cell_index|
@@ -52,13 +53,21 @@ class CellCache
             lock_hash: output.lock.compute_hash, lock_args: output.lock.args, lock_code_hash: output.lock.code_hash,
             lock_hash_type: output.lock.hash_type, type_hash: output.type&.compute_hash, type_args: output.type&.args,
             type_code_hash: output.type&.code_hash, type_hash_type: output.type&.hash_type,
-            output_data_len: output.calculate_bytesize(outputs_data[cell_index]), tx_hash: transaction.hash,
-            created_at: Time.now, updated_at: Time.now
+            output_data_len: CKB::Utils.hex_to_bin(outputs_data[cell_index]).bytesize, tx_hash: transaction.hash,
+            created_at: Time.now, updated_at: Time.now, epoch_number: parse_epoch(epoch).number
           }
         end
       return if attributes.blank?
 
       Output.insert_all!(attributes)
+    end
+
+    def parse_epoch(epoch)
+      OpenStruct.new(
+        length: (epoch >> 40) & 0xFFFF,
+        index: (epoch >> 24) & 0xFFFF,
+        number: (epoch) & 0xFFFFFF
+      )
     end
 
     def cellbase(tx_index)
@@ -74,7 +83,7 @@ class CellCache
     end
 
     def consume_cell(transaction)
-      inputs = transaction.inputs.select { |input| input.previous_output.tx_hash != "0x0000000000000000000000000000000000000000000000000000000000000000" }
+      inputs = transaction.inputs.select { |input| input.previous_output.tx_hash != SYSTEM_TX_HASH }
       attributes = inputs.map do |input|
         { tx_hash: input.previous_output.tx_hash, cell_index: input.previous_output.index, status: Output.statuses[:dead], created_at: Time.now, updated_at: Time.now }
       end

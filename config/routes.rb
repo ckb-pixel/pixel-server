@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :pixel_cells, only: :index
+      resources :live_cells, only: :show
     end
   end
 end
