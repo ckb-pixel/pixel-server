@@ -20,6 +20,7 @@ end
 #  cell_type       :integer          default("normal")
 #  cellbase        :boolean
 #  data            :binary
+#  epoch_number    :integer
 #  lock_args       :string
 #  lock_code_hash  :string
 #  lock_hash       :string
