@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Output < ApplicationRecord
+  MAX_PAGINATES_PER = 100
+  paginates_per 10
+  max_paginates_per MAX_PAGINATES_PER
+
   enum cell_type: { normal: 0, pixel: 1 }
   enum status: { dead: 0, live: 1 }
 end
