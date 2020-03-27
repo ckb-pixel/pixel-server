@@ -5,7 +5,7 @@ class OutputSerializer
   attributes :block_hash, :cellbase
 
   attribute :capacity do |object|
-    object.to_s
+    object.capacity.to_s
   end
 
   attribute :lock do |object|
