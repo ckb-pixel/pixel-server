@@ -10,10 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_27_083013) do
+ActiveRecord::Schema.define(version: 2020_03_27_084556) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "outputs", force: :cascade do |t|
+    t.string "block_hash"
+    t.decimal "capacity", precision: 30
+    t.boolean "cellbase"
+    t.string "lock_args"
+    t.string "lock_code_hash"
+    t.string "lock_hash_type"
+    t.string "type_args"
+    t.string "type_code_hash"
+    t.string "type_hash_type"
+    t.integer "cell_index"
+    t.string "tx_hash"
+    t.binary "data"
+    t.integer "output_data_len"
+    t.integer "cell_type", default: 0
+    t.string "lock_hash"
+    t.string "type_hash"
+    t.integer "status", default: 1
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "sync_infos", force: :cascade do |t|
     t.bigint "tip_block_number"
