@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 class SyncInfo < ApplicationRecord
   enum status: { pending: 0, completed: 1, forked: 2 }
+
+  scope :recent, -> { order(tip_block_number: :desc) }
 end
 
 # == Schema Information

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Output < ApplicationRecord
   enum cell_type: { normal: 0, pixel: 1 }
   enum status: { dead: 0, live: 1 }
@@ -27,4 +29,8 @@ end
 #  type_hash_type  :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_outputs_on_tx_hash_and_cell_index  (tx_hash,cell_index) UNIQUE
 #
