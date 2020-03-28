@@ -15,7 +15,6 @@ class Collector
           output_index = 0
           outputs = Output.where(lock_hash: lock_hash).live.page(page).per(100).to_a
           page += 1
-          puts "page: #{page}"
         end
         raise StopIteration if page > total_pages
       end

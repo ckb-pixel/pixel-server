@@ -11,7 +11,6 @@ class CellCache
     tip_block_number = Api.instance.get_tip_block_number
     target_block_number = sync_info.present? ? sync_info.tip_block_number + 1 : 0
     return if target_block_number > tip_block_number
-    puts "block_number: #{target_block_number}"
 
     target_block = Api.instance.get_block_by_number(target_block_number)
 

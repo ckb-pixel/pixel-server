@@ -52,7 +52,6 @@ class InitPixelCells
 
     def outputs_data
       outputs.each_with_index.map do |output, index|
-        puts "index: #{index}"
         if index < 2500
           x, y, r, g, b = pixel_data[index][:coordinates][0] / 16, pixel_data[index][:coordinates][1] / 16, pixel_data[index][:color][0], pixel_data[index][:color][1], pixel_data[index][:color][2]
           generate_pixel_data(x, y, r, g, b)
