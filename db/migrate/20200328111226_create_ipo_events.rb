@@ -8,6 +8,8 @@ class CreateIpoEvents < ActiveRecord::Migration[6.0]
       t.decimal :capacity, precision: 30
       t.string :block_hash
       t.integer :status, default: 1
+      t.string :block_timestamp
+      t.string :block_number
 
       t.timestamps
     end

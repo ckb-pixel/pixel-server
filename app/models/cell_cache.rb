@@ -45,16 +45,18 @@ class CellCache
       end
     end
 
-    def save_outputs(block_hash, tx_index, transaction, epoch)
+    def save_outputs(block_header, tx_index, transaction, epoch)
       outputs, outputs_data = transaction.outputs, transaction.outputs_data
       investment_input = nil
+      invest_capacity = nil
       attributes =
         outputs.each_with_index.map do |output, cell_index|
           if output.lock.compute_hash == OFFICIAL_PIXEL_IPO_LOCK_SCRIPT_HASH
             investment_input = transaction.inputs.first
+            invest_capacity = output.capacity
           end
           {
-            block_hash: block_hash, capacity: output.capacity, cell_index: cell_index,
+            block_hash: block_header.block_hash, capacity: output.capacity, cell_index: cell_index,
             cell_type: cell_type(output), cellbase: cellbase(tx_index), data: outputs_data[cell_index],
             lock_hash: output.lock.compute_hash, lock_args: output.lock.args, lock_code_hash: output.lock.code_hash,
             lock_hash_type: output.lock.hash_type, type_hash: output.type&.compute_hash, type_args: output.type&.args,
@@ -64,18 +66,18 @@ class CellCache
           }
         end
       return if attributes.blank?
-      create_ipo_event(investment_input, block_hash)
+      create_ipo_event(investment_input, block_header, invest_capacity, )
       Output.insert_all!(attributes)
     end
 
-    def create_ipo_event(investment_input, block_hash)
+    def create_ipo_event(investment_input, block_header, invest_capacity)
       return if investment_input.nil?
 
       tx_hash, cell_index = investment_input.previous_output.tx_hash, investment_input.previous_output.index
       output = Output.find_by(tx_hash: tx_hash, cell_index: cell_index)
       investor_lock_script = CKB::Types::Script.new(code_hash: output.lock_code_hash, args: output.lock_args, hash_type: output.lock_hash_type)
       investor_address = CKB::Address.new(investor_lock_script).generate
-      IpoEvent.create!(block_hash: block_hash, capacity: output.capacity, from_address: investor_address)
+      IpoEvent.create!(block_hash: block_header.block_hash, block_number: block_header.number, block_timestamp: block_header.timestamp, capacity: invest_capacity, from_address: investor_address)
     end
 
     def parse_epoch(epoch)
