@@ -7,6 +7,11 @@ class Output < ApplicationRecord
 
   enum cell_type: { normal: 0, pixel: 1 }
   enum status: { dead: 0, live: 1 }
+
+  def generate_pixel_data(x, y, r, g, b)
+    result = [x, y, r, g, b].pack("C*").unpack1("H*")
+    "0x#{result}"
+  end
 end
 
 # == Schema Information
