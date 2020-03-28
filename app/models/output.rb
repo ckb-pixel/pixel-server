@@ -16,7 +16,7 @@ class Output < ApplicationRecord
   end
 
   def official_lock_script
-    CKB::AddressParser.new("ckt1qyqwrlu02gygcyf0p7m9atqyyulr9dwe3jvsgerwfy").parse.script
+    CKB::AddressParser.new("ckt1qyqfqvtd6tkrxm97yvtwqe9qx3n4ce7jt6pqp3hz7c").parse.script
   end
 end
 

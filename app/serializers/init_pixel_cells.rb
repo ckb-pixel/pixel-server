@@ -8,12 +8,12 @@ class InitPixelCells
     contexts = [Rails.application.credentials.PIXEL_PRV_KEY]
     tx_generator = build(contexts: contexts)
     tx = sign(tx_generator: tx_generator, contexts: contexts)
-    Api.instance.send_transaction(tx)
+    api.send_transaction(tx)
   end
 
   private
     def input_script
-      CKB::AddressParser.new("ckt1qyqwrlu02gygcyf0p7m9atqyyulr9dwe3jvsgerwfy").parse.script
+      CKB::AddressParser.new("ckt1qyqfqvtd6tkrxm97yvtwqe9qx3n4ce7jt6pqp3hz7c").parse.script
     end
 
     def build(contexts: [], fee_rate: 1)
@@ -54,7 +54,7 @@ class InitPixelCells
       outputs.each_with_index.map do |output, index|
         puts "index: #{index}"
         if index < 2500
-          x, y, r, g, b = pixel_data[index][:coordinates][0], pixel_data[index][:coordinates][1], pixel_data[index][:color][0], pixel_data[index][:color][1], pixel_data[index][:color][2]
+          x, y, r, g, b = pixel_data[index][:coordinates][0] / 16, pixel_data[index][:coordinates][1] / 16, pixel_data[index][:color][0], pixel_data[index][:color][1], pixel_data[index][:color][2]
           generate_pixel_data(x, y, r, g, b)
         end
       end.compact
