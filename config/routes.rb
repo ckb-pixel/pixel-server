@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :pixel_cells, only: :index
       resources :live_cells, only: :show
+      resources :pixel_cell_recordings, only: :index
     end
   end
 end
