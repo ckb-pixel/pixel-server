@@ -23,7 +23,6 @@ class LiveCellService
 
   private
     def capacity_enough?
-      puts "live_cells_capacity: #{live_cells_capacity}"
       live_cells_capacity >= need_capacity
     end
 
@@ -37,7 +36,6 @@ class LiveCellService
 
             result << output
           end
-          result << output
         rescue StopIteration
           break
         end
