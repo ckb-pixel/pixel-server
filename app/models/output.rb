@@ -4,19 +4,16 @@ class Output < ApplicationRecord
   MAX_PAGINATES_PER = 100
   paginates_per 10
   max_paginates_per MAX_PAGINATES_PER
+  OFFICIAL_PIXEL_TYPE_ARGS = "0x7598a26c1470f4e17df67899b4ab5619d447dd30fa20242e63fee4de9e93ae62"
 
   enum cell_type: { normal: 0, pixel: 1 }
   enum status: { dead: 0, live: 1 }
 
-  scope :official_pixels, -> { where(type_args: official_lock_script.compute_hash) }
+  scope :official_pixels, -> { where(type_args: OFFICIAL_PIXEL_TYPE_ARGS) }
 
   def generate_pixel_data(x, y, r, g, b)
     result = [x, y, r, g, b].pack("C*").unpack1("H*")
     "0x#{result}"
-  end
-
-  def official_lock_script
-    CKB::AddressParser.new("ckt1qyqfqvtd6tkrxm97yvtwqe9qx3n4ce7jt6pqp3hz7c").parse.script
   end
 end
 
