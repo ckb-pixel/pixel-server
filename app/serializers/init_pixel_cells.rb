@@ -8,8 +8,7 @@ class InitPixelCells
     contexts = [Rails.application.credentials.PIXEL_PRV_KEY]
     tx_generator = build(contexts: contexts)
     tx = sign(tx_generator: tx_generator, contexts: contexts)
-    binding.pry
-    # Api.instance.send_transaction(tx)
+    Api.instance.send_transaction(tx)
   end
 
   private
