@@ -75,7 +75,9 @@ class CellCache
     end
 
     def cell_type(output)
-      if output.lock.compute_hash == PIXEL_LOCK_CODE_HASH && output.type.compute_hash == PIXEL_TYPE_CODE_HASH
+      return Output.cell_types[:normal] if output.type.nil?
+
+      if output.lock.code_hash == PIXEL_LOCK_CODE_HASH && output.type.code_hash == PIXEL_TYPE_CODE_HASH
         Output.cell_types[:pixel]
       else
         Output.cell_types[:normal]
