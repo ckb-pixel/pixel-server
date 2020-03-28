@@ -13,6 +13,7 @@ class CellCache
     return if target_block_number > tip_block_number
 
     target_block = Api.instance.get_block_by_number(target_block_number)
+    puts "block number: #{target_block_number}"
 
     if !forked?(target_block, sync_info)
       process_block(target_block)
