@@ -4,6 +4,7 @@ class CellCache
   PIXEL_LOCK_CODE_HASH = "0xe959ac726354858d598c9ea1ceb5f617e409b1b0a4a3baa25aa08b6da7b95091"
   PIXEL_TYPE_CODE_HASH = "0x295c725e14ddd32019d09b1a72876d688d494281a1a973aa19eaf9a9d2e84bd1"
   SYSTEM_TX_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000"
+  OFFICIAL_PIXEL_IPO_LOCK_SCRIPT_HASH = "0xd3d800fcb872b9472a108319f96544ec68417441ad6b0e53851c1fb20e4ec716"
 
   def call
     sync_info = SyncInfo.recent.completed.first
@@ -24,8 +25,9 @@ class CellCache
   private
     def revert_sync_info(sync_info)
       ApplicationRecord.transaction do
-        sync_info.update(status: "forked")
+        sync_info.update!(status: "forked")
         Output.where(block_hash: sync_info.tip_block_hash).delete_all
+        IpoEvent.where(block_hash: sync_info.tip_block_hash).update!(status: "forked")
       end
     end
 
@@ -45,8 +47,12 @@ class CellCache
 
     def save_outputs(block_hash, tx_index, transaction, epoch)
       outputs, outputs_data = transaction.outputs, transaction.outputs_data
+      investment_input = nil
       attributes =
         outputs.each_with_index.map do |output, cell_index|
+          if output.lock.compute_hash == OFFICIAL_PIXEL_IPO_LOCK_SCRIPT_HASH
+            investment_input = transaction.inputs.first
+          end
           {
             block_hash: block_hash, capacity: output.capacity, cell_index: cell_index,
             cell_type: cell_type(output), cellbase: cellbase(tx_index), data: outputs_data[cell_index],
@@ -58,8 +64,18 @@ class CellCache
           }
         end
       return if attributes.blank?
-
+      create_ipo_event(investment_input, block_hash)
       Output.insert_all!(attributes)
+    end
+
+    def create_ipo_event(investment_input, block_hash)
+      return if investment_input.nil?
+
+      tx_hash, cell_index = investment_input.previous_output.tx_hash, investment_input.previous_output.index
+      output = Output.find_by(tx_hash: tx_hash, cell_index: cell_index)
+      investor_lock_script = CKB::Types::Script.new(code_hash: output.lock_code_hash, args: output.lock_args, hash_type: output.lock_hash_type)
+      investor_address = CKB::Address.new(investor_lock_script).generate
+      IpoEvent.create!(block_hash: block_hash, capacity: output.capacity, from_address: investor_address)
     end
 
     def parse_epoch(epoch)
