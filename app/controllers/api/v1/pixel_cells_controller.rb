@@ -15,8 +15,8 @@ class Api::V1::PixelCellsController < ApplicationController
 
     def generate_fake_pixel_cells
       outputs = []
-      (0..784).step(16).each do |x|
-        (0..784).step(16).each do |y|
+      (0..50).each do |x|
+        (0..50).each do |y|
           r, g, b = rand(0..255), rand(0..255), rand(0..255)
           output =
             Output.new(
