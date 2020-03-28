@@ -25,9 +25,9 @@ class CellCache
   private
     def revert_sync_info(sync_info)
       ApplicationRecord.transaction do
-        sync_info.update!(status: "forked")
+        sync_info.update(status: "forked")
         Output.where(block_hash: sync_info.tip_block_hash).delete_all
-        IpoEvent.where(block_hash: sync_info.tip_block_hash).update!(status: "forked")
+        IpoEvent.where(block_hash: sync_info.tip_block_hash).update(status: "forked")
       end
     end
 
