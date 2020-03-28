@@ -7,7 +7,7 @@
     enum status: { forked: 0, normal: 1 }
 
     def record
-      block_hash = SyncInfo.recent.first.completed.tip_block_hash
+      block_hash = SyncInfo.recent.completed.first.tip_block_hash
       cell_ids = Output.pixel.live.ids
       PixelCellRecording.create(block_hash: block_hash, cell_ids: cell_ids, status: "normal")
     end
