@@ -41,11 +41,11 @@ class CellCache
     def create_output(target_block)
       target_block.transactions.each_with_index do |transaction, tx_index|
         consume_cell(transaction)
-        save_outputs(target_block.header.hash, tx_index, transaction, target_block.header.epoch)
+        save_outputs(target_block.header, tx_index, transaction)
       end
     end
 
-    def save_outputs(block_header, tx_index, transaction, epoch)
+    def save_outputs(block_header, tx_index, transaction)
       outputs, outputs_data = transaction.outputs, transaction.outputs_data
       investment_input = nil
       invest_capacity = nil
@@ -56,13 +56,13 @@ class CellCache
             invest_capacity = output.capacity
           end
           {
-            block_hash: block_header.block_hash, capacity: output.capacity, cell_index: cell_index,
+            block_hash: block_header.hash, capacity: output.capacity, cell_index: cell_index,
             cell_type: cell_type(output), cellbase: cellbase(tx_index), data: outputs_data[cell_index],
             lock_hash: output.lock.compute_hash, lock_args: output.lock.args, lock_code_hash: output.lock.code_hash,
             lock_hash_type: output.lock.hash_type, type_hash: output.type&.compute_hash, type_args: output.type&.args,
             type_code_hash: output.type&.code_hash, type_hash_type: output.type&.hash_type,
             output_data_len: CKB::Utils.hex_to_bin(outputs_data[cell_index]).bytesize, tx_hash: transaction.hash,
-            created_at: Time.now, updated_at: Time.now, epoch_number: parse_epoch(epoch).number
+            created_at: Time.now, updated_at: Time.now, epoch_number: parse_epoch(block_header.epoch).number
           }
         end
       return if attributes.blank?
@@ -77,7 +77,7 @@ class CellCache
       output = Output.find_by(tx_hash: tx_hash, cell_index: cell_index)
       investor_lock_script = CKB::Types::Script.new(code_hash: output.lock_code_hash, args: output.lock_args, hash_type: output.lock_hash_type)
       investor_address = CKB::Address.new(investor_lock_script).generate
-      IpoEvent.create!(block_hash: block_header.block_hash, block_number: block_header.number, block_timestamp: block_header.timestamp, capacity: invest_capacity, from_address: investor_address)
+      IpoEvent.create!(block_hash: block_header.hash, block_number: block_header.number, block_timestamp: block_header.timestamp, capacity: invest_capacity, from_address: investor_address)
     end
 
     def parse_epoch(epoch)

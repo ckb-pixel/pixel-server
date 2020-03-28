@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       resources :pixel_cells, only: :index
       resources :live_cells, only: :show
       resources :pixel_cell_recordings, only: :index
+      resources :ipo_events, only: :index
     end
   end
 end
