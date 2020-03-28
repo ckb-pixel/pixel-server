@@ -8,7 +8,7 @@
 
     def record
       block_hash = SyncInfo.recent.completed.first.tip_block_hash
-      cell_ids = Output.pixel.live.ids
+      cell_ids = Output.pixel.live.official_pixels.ids
       PixelCellRecording.create(block_hash: block_hash, cell_ids: cell_ids, status: "normal")
     end
   end
