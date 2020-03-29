@@ -4,7 +4,7 @@ class Api::V1::PixelCellRecordingsController < ApplicationController
   before_action :pagination_params, only: :index
 
   def index
-    recordings = PixelCellRecording.normal.page(@page).per(@page_size)
+    recordings = PixelCellRecording.normal
     render json: PixelCellRecordingSerializer.new(recordings)
   end
 
