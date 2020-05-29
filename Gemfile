@@ -31,7 +31,7 @@ gem "bootsnap", ">= 1.4.2", require: false
 gem "ckb-sdk-ruby", git: "https://github.com/shaojunda/ckb-sdk-ruby.git", require: "ckb", branch: "shaojunda-add-tx-builder"
 
 gem "fast_jsonapi"
-gem "kaminari"
+gem "kaminari", ">= 1.2.1"
 
 # Deployment
 gem "mina", require: false
